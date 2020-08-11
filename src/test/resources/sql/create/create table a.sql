@@ -1,0 +1,1 @@
+create table test.a(pk serial pk, some_text_field txt);
