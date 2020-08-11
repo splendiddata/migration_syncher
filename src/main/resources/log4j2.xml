@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration>
+    <Appenders>
+        <Console name="console">
+            <PatternLayout pattern="%-5p %c{1} - %m%n" />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.splendiddata" level="info" />
+
+        <Root level="info">
+            <AppenderRef ref="console" />
+        </Root>
+    </Loggers>
+</Configuration>
