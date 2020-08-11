@@ -105,7 +105,7 @@ public class TestMigrationSyncherMain extends MigrationSyncherMain {
                         "src/test/resources/sql/create/create table a.sql",
                         "src/test/resources/sql/update/file containing an error that is supposed to be removed later",
                         "src/test/resources/sql/update/some_function.sql")),
-                Arguments.arguments("2f2eee08edcfa4bb26ca9a972ab8e2167ea50694", true,
+                Arguments.arguments("adb47fb9b5abdceb5a369a3c9e6fe53f9a927535", true,
                         Collections.singletonList("src/test/resources/sql/update/some_function.sql")),
                 Arguments.arguments("head", false, Collections.emptySet()));
     }

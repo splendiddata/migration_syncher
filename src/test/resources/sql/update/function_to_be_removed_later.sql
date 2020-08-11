@@ -1,1 +1,0 @@
-drop function test.function_to_be_removed_later();
