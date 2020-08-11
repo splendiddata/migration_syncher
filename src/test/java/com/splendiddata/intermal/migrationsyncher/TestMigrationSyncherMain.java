@@ -101,7 +101,7 @@ public class TestMigrationSyncherMain extends MigrationSyncherMain {
         return Stream.of(Arguments.arguments("9726dfd85ff6cd4ce336dedd8e339ccf17a8993e", false, Collections.emptySet()),
                 Arguments.arguments("682adee3f03392aa7210238822c5d2818ddea35e", true,
                         Arrays.asList("src/test/resources/sql/create/create table a.sql")),
-                Arguments.arguments("79cc577da304fcd21581bc8e4ee3096e4ae1aa43", true, Arrays.asList(
+                Arguments.arguments("e62d515af4e59b10b3e9aea9e49ac6c56ca2d650", true, Arrays.asList(
                         "src/test/resources/sql/create/create table a.sql",
                         "src/test/resources/sql/update/file containing an error that is supposed to be removed later",
                         "src/test/resources/sql/update/some_function.sql")),

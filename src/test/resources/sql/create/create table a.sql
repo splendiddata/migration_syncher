@@ -1,1 +1,1 @@
-create table test.a(pk serial primary key, some_text_field txt);
+create table test.a(pk serial primary key, some_text_field text);
