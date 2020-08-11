@@ -99,7 +99,7 @@ public class TestMigrationSyncherMain extends MigrationSyncherMain {
 
     static Stream<Arguments> liveTest() {
         return Stream.of(Arguments.arguments("9726dfd85ff6cd4ce336dedd8e339ccf17a8993e", false, Collections.emptySet()),
-                Arguments.arguments("b304a6e1062053a7f496e82f0b74ca7015106fd6", true,
+                Arguments.arguments("682adee3f03392aa7210238822c5d2818ddea35e", true,
                         Arrays.asList("src/test/resources/sql/create/create table a.sql")),
                 Arguments.arguments("79cc577da304fcd21581bc8e4ee3096e4ae1aa43", true, Arrays.asList(
                         "src/test/resources/sql/create/create table a.sql",
