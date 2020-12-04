@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2013
+ * Copyright (c) Splendid Data Product Development B.V. 2020
  * 
  * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
  * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
@@ -83,7 +83,7 @@ public class MigrationSyncherMain {
                         doSynchronise(false);
                     } else {
                         if (dbCommitId == null) {
-                            log.info("setting initial commit id " + fsCommitId);
+                            log.info("setting initial commit id " + fsCommitId.getName());
                         } else {
                             log.info(new StringBuilder().append("processing files between commit id: ")
                                     .append(dbCommitId.getName()).append(" and: ").append(fsCommitId.getName()));

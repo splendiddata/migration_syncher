@@ -10,13 +10,21 @@ java -jar migration_syncher.jar my_database.properties
 ```
 
 If the properties file does not exist, then it will be created with default values. Please adjust it to reflect the right database and the right git repository. The comment in the generated properties file should provide sufficient information to correctly fill in the properties.
+
+All properties in the property file can be overridden by system properties if desired.
+
+If no database name is provided, it will be obtained from environment variable PGDATABASE.
+
+If no database user name is provided, it will be obrainted from environment variable PGUSER.
+
+IF no database password is provided, is till be looked up in the .pgpass file that is identified by the PGPASSFILE environment variable or in the .pgpass file in the user's home directory.
 ## First execution
-The first time the program runs with correct properties filled in, it will clone the git repository and create a schema in the database.
+The first time the program runs with correct properties filled in, it will create a schema in the database and clone the git repository if a GIT_REMOTE_REPOSITORY_URL is provided.
 
 The program assumes that the database is in synch with the git repository when it runs the first time. So it doesn’t execute anything from the git repository. It just logs the commit id in the last_commit table and leaves.
 ## Subsequent executions
 Every following run of the program performs the following steps:
-* Execute a git pull
+* Execute a git pull if a GIT_REMOTE_REPOSITORY_URL is provided
 * Determine which files have changed since the last time the program ran, based on the stored commit id from the last_commit table and the current commit id in the repository
 * Execute each changed file in the database.
 * Log the execution results in the file_execution_log table

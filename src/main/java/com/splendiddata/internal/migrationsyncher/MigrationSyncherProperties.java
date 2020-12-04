@@ -1,29 +1,29 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2013
+ * Copyright (c) Splendid Data Product Development B.V. 2020
  * 
- * This program is free software: You may redistribute and/or modify under the 
- * terms of the GNU General Public License as published by the Free Software 
- * Foundation, either version 3 of the License, or (at Client's option) any 
- * later version.
+ * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
+ * version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with 
- * this program.  If not, Client should obtain one via www.gnu.org/licenses/.
+ * You should have received a copy of the GNU General Public License along with this program. If not, Client should
+ * obtain one via www.gnu.org/licenses/.
  */
 
 package com.splendiddata.internal.migrationsyncher;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -44,13 +44,74 @@ import org.apache.logging.log4j.Logger;
 public class MigrationSyncherProperties {
     private static final Logger log = LogManager.getLogger(MigrationSyncherProperties.class);
 
+    /**
+     * Property name for the host name or ip address of the database
+     * <p>
+     * The property in the provided properties file can be overridden by system property DB_HOST
+     */
     private static final String DB_HOST = "DB_HOST";
+
+    /**
+     * Property name for the portnumber of the database
+     * <p>
+     * The property in the provided properties file can be overridden by the system property DB_PORT
+     * <p>
+     * Default value: 5432
+     */
     private static final String DB_PORT = "DB_PORT";
+
+    /**
+     * Property name for the database name
+     * <p>
+     * The property in the provided properties file can be overridden by system property DB_NAME
+     * <p>
+     * If no property DB_NAME can be found, then an attempt is made to retrieve the database name from the PGDATABASE
+     * environment variable
+     */
     private static final String DB_NAME = "DB_NAME";
+
+    /**
+     * Property name for the user name to use for logging on to the database
+     * <p>
+     * The property in the provided properties file can be overridden by the system property DB_USER
+     * <p>
+     * If no property DB_USER is provided, then attempt is made to retrieve the user name from the PGUSER environment
+     * variable
+     */
     private static final String DB_USER = "DB_USER";
+
+    /**
+     * Property name for the password to use for logging on to the database
+     * <p>
+     * The property in the provided properties file can be overridden by the system property DB_PASSWORD
+     * <p>
+     * If no property DB_PASSWORD is provided, then attempt is made to read it from the .pgpass file. To find the
+     * .pgpass file, the Postgres rules are applied: If environment variable PGPASSFILE exists, then the file appointed
+     * by that variable is used. Otherwise the .pgpass file that exists in the user's home directory will be used.
+     */
     private static final String DB_PASSWORD = "DB_PASSWORD";
+
+    /**
+     * Property name for the schema name in which the migration_syncher will log it's current state
+     * <p>
+     * The property in the provided properties file can be overridden by the system property DB_SYNCHER_SCHEMA
+     * <p>
+     * Default value: splendiddata_migration_syncher
+     */
     private static final String DB_SYNCHER_SCHEMA = "DB_SYNCHER_SCHEMA";
+
+    /**
+     * Property name for the search_path that can be specified if the application needs that
+     * <p>
+     * The property in the provided properties file can be overridden by system property DB_SEARCH_PATH
+     */
     private static final String DB_SEARCH_PATH = "DB_SEARCH_PATH";
+
+    /**
+     * Property name for the initial sql script if the application needs that. Typically used to set a role.
+     * <p>
+     * The property in the provided properties file can be overridden by system property DB_INITIAL_SQL
+     */
     private static final String DB_INITIAL_SQL = "DB_INITIAL_SQL";
 
     private static final String GIT_LOCAL_REPOSITORY = "GIT_LOCAL_REPOSITORY";
@@ -114,11 +175,35 @@ public class MigrationSyncherProperties {
             log.error("DB_PORT property must be an integer in " + propertiesPath + ", 5432 assumed", e);
         }
         dbPort = portInt;
-        dbName = System.getProperty(DB_NAME, properties.getProperty(DB_NAME, "<unknown database>")).trim();
-        dbUser = System.getProperty(DB_USER, properties.getProperty(DB_USER, "<unknown user>")).trim();
-        String pwd = System.getProperty(DB_PASSWORD, properties.getProperty(DB_PASSWORD, null));
-        if (pwd != null) {
-            pwd = pwd.trim();
+        dbName = System.getProperty(DB_NAME,
+                properties.getProperty(DB_NAME, System.getenv().getOrDefault("PGDATABASE", "<unknown database>")))
+                .trim();
+        dbUser = System
+                .getProperty(DB_USER,
+                        properties.getProperty(DB_USER, System.getenv().getOrDefault("PGUSER", "<unknown user>")))
+                .trim();
+        String pwd = System.getProperty(DB_PASSWORD, properties.getProperty(DB_PASSWORD, "")).trim();
+        if ("".equals(pwd)) {
+            Path pgPassFile = Paths.get(System.getenv().getOrDefault("PGPASSFILE",
+                    System.getProperty("user.home") + System.getProperty("file.separator") + ".pgpass"));
+            if (Files.isRegularFile(pgPassFile)) {
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(Files.newInputStream(pgPassFile)))) {
+                    for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                        String[] fields = line.split("(?<!\\\\):");
+                        if (fields.length >= 5
+                                && (fields[0].equalsIgnoreCase(dbHost)
+                                        || ("localhost".equalsIgnoreCase(fields[0]) && "127.0.0.1".equals(dbHost))
+                                        || ("\\:\\:1".equals(fields[0]) && "localhost".equalsIgnoreCase(dbHost))
+                                        || ("localhost".equalsIgnoreCase(fields[0]) && "::1".equals(dbHost))
+                                        || ("127.0.0.1".equals(fields[0]) && "localhost".equalsIgnoreCase(dbHost)))
+                                && fields[1].equals(Integer.toString(dbPort)) && fields[3].equalsIgnoreCase(dbUser)) {
+                            pwd = fields[4];
+                            break;
+                        }
+                    }
+                }
+            }
         }
         dbPassword = pwd;
         dbSyncherSchema = System.getProperty(DB_SYNCHER_SCHEMA,
@@ -421,7 +506,7 @@ public class MigrationSyncherProperties {
         out.println();
         out.println("# ##############################################################################");
         out.println("# #  Comma separated list of directories in the git repository that contain    #");
-        out.println("# #  files that are to be applied to the database. If empty or star (\"*\")    #");
+        out.println("# #  files that are to be applied to the database. If empty or star (\"*\")      #");
         out.println("# #  then all changed files in the repository are applied to the database.     #");
         out.println("# ##############################################################################");
         out.print("INCLUDE_DIRECTORIES       = ");
