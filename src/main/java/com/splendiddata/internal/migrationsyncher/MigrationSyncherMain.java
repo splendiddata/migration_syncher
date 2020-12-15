@@ -118,7 +118,12 @@ public class MigrationSyncherMain {
      *             if the properties file does exist but is not readable
      */
     protected static boolean processPropertiesFile(String propertiesArg) throws IOException {
-        Path propertiesPath = Paths.get(propertiesArg);
+        Path propertiesPath;
+        if ("0".equals(propertiesArg)) {
+            propertiesPath = Paths.get(DEFAULT_PROPERTIES_FILE);
+        } else {
+            propertiesPath = Paths.get(propertiesArg);
+        }
         properties = new MigrationSyncherProperties(propertiesPath);
         if (propertiesPath.toFile().exists()) {
             log.info("properties:" + properties);

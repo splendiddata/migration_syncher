@@ -91,7 +91,7 @@ public class MigrationSyncherDbInterface implements Closeable {
         if (!syncherSchemaPresent) {
             createSyncherSchema();
         }
-        if (properties.getDbSearchPath() == null) {
+        if (properties.getDbSearchPath() == null || "null".equalsIgnoreCase(properties.getDbSearchPath())|| properties.getDbSearchPath().matches("^\\s*$")) {
             searchPath = null;
         } else {
             searchPath = "set search_path = " + properties.getDbSearchPath();

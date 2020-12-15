@@ -388,7 +388,7 @@ public class MigrationSyncherProperties {
         out.println(getDbName());
         out.print("DB_USER                   = ");
         out.println(getDbUser());
-        out.print("DB_SYNCH_SCHEMA           = ");
+        out.print("DB_SYNCHER_SCHEMA         = ");
         out.println(getDbSyncherSchema());
         if (getDbSearchPath() != null) {
             out.print("DB_SEARCH_PATH            = ");
@@ -434,7 +434,7 @@ public class MigrationSyncherProperties {
         out.println("# ##############################################################################");
         out.println("# #  Database connection properties                                            #");
         out.println("# # -------------------------------------------------------------------------- #");
-        out.println("# #  The DB_SYNCH_SCHEMA is used for administration of the synchronisation     #");
+        out.println("# #  The DB_SYNCHER_SCHEMA is used for administration of the synchronisation   #");
         out.println("# #  process. PLease use a distinct name for it and don't include this schema  #");
         out.println("# #  when the database is delivered to a customer. It will be created if it    #");
         out.println("# # -------------------------------------------------------------------------- #");
@@ -444,7 +444,7 @@ public class MigrationSyncherProperties {
         out.println("# #  DB_NAME                    Name of the database to connect to             #");
         out.println("# #  DB_USER                    User name to login to the database             #");
         out.println("# #  DB_PASSWORD                Password to login to the database              #");
-        out.println("# #  DB_SYNCH_SCHEMA            Schema that is to be used for the syncher      #");
+        out.println("# #  DB_SYNCHER_SCHEMA          Schema that is to be used for the syncher      #");
         out.println("# #                             process. By default:                           #");
         out.println("# #                             splendiddata_migration_syncher                 #");
         out.println("# #  DB_SEARCH_PATH             The search path to use while synching. This    #");
@@ -463,7 +463,7 @@ public class MigrationSyncherProperties {
         out.println(getDbUser());
         out.print("DB_PASSWORD               = ");
         out.println("*******");
-        out.print("DB_SYNCH_SCHEMA           = ");
+        out.print("DB_SYNCHER_SCHEMA         = ");
         out.println(getDbSyncherSchema());
         out.print("DB_SEARCH_PATH            = ");
         out.println(getDbSearchPath());
