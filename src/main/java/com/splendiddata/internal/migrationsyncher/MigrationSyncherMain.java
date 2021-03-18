@@ -292,8 +292,8 @@ public class MigrationSyncherMain {
      */
     private static boolean executeFile(String file) throws IOException, SQLException {
         String fileContent = Files.readString(Paths.get(properties.getGitLocalRepository(), file));
-        if (fileContent.charAt(0) == 0xFEFF) {
-            // Remove the BOM character
+        if (fileContent != null && fileContent.length() > 0 && fileContent.charAt(0) == 0xFEFF) {
+            log.debug(()-> "BOM character removed from " + file);
             fileContent = fileContent.substring(1);
         }
 
