@@ -70,8 +70,8 @@ public class MigrationSyncherMain {
             errorEncountered = processPropertiesFile(args.length > 0 ? args[0] : DEFAULT_PROPERTIES_FILE);
 
             if (!errorEncountered) {
-                try (MigrationSyncherDbInterface dbConn = new MigrationSyncherDbInterface(properties);
-                        MigrationSyncherGitInterface gitInterface = new MigrationSyncherGitInterface(properties)) {
+                try (MigrationSyncherGitInterface gitInterface = new MigrationSyncherGitInterface(properties);
+                        MigrationSyncherDbInterface dbConn = new MigrationSyncherDbInterface(properties)) {
                     db = dbConn;
                     git = gitInterface;
 
