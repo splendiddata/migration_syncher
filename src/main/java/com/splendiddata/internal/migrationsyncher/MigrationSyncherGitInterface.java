@@ -64,6 +64,10 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 public class MigrationSyncherGitInterface implements Closeable {
     private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(MigrationSyncherGitInterface.class);
 
+    /**
+     * Environment variable that could contain a proxy server for https connections
+     */
+    private static final String ENV_HTTPS_PROXY = "https_proxy";
     private final Git git;
     private Path repoDirectory;
     private final List<String> environmentVariables = new ArrayList<>();
@@ -106,6 +110,12 @@ public class MigrationSyncherGitInterface implements Closeable {
             passwordScriptFile.setExecutable(true);
             environmentVariables.add("GIT_PASSWORD=" + properties.getGitPassword());
             environmentVariables.add("GIT_ASKPASS=" + passwordScriptFile.getAbsolutePath());
+        }
+        String proxy = System.getenv(ENV_HTTPS_PROXY);
+        if (proxy != null) {
+            proxy = ENV_HTTPS_PROXY  + "=" + proxy;
+            environmentVariables.add(proxy);
+            log.info("Using: " + proxy);
         }
 
         repoDirectory = Paths.get(properties.getGitLocalRepository());
