@@ -113,7 +113,7 @@ public class MigrationSyncherGitInterface implements Closeable {
         }
         String proxy = System.getenv(ENV_HTTPS_PROXY);
         if (proxy != null) {
-            proxy = ENV_HTTPS_PROXY  + "=" + proxy;
+            proxy = ENV_HTTPS_PROXY + "=" + proxy;
             environmentVariables.add(proxy);
             log.info("Using: " + proxy);
         }
@@ -316,17 +316,18 @@ public class MigrationSyncherGitInterface implements Closeable {
             throws IncorrectObjectTypeException, MissingObjectException, IOException, GitAPIException {
         log.trace(() -> new StringBuilder().append("@>getAlteredFiles(=").append(historicalCommitId)
                 .append(", latestCommmitId=").append(latestCommmitId).append(")"));
+        List<DiffEntry> diffs;
         Repository repository = git.getRepository();
-        ObjectReader reader = repository.newObjectReader();
-        CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-        oldTreeIter.reset(reader, getTreeId(historicalCommitId));
-        CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-        newTreeIter.reset(reader, getTreeId(latestCommmitId));
-        List<DiffEntry> diffs = git.diff().setShowNameAndStatusOnly(true).setNewTree(newTreeIter)
-                .setOldTree(oldTreeIter).call();
-        log.debug(() -> new StringBuilder().append("@<getAlteredFiles(=").append(historicalCommitId)
-                .append(", latestCommmitId=").append(latestCommmitId).append(") = ").append(diffs.size())
-                .append(" DiffEntires"));
+        try (ObjectReader reader = repository.newObjectReader()) {
+            CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+            oldTreeIter.reset(reader, getTreeId(historicalCommitId));
+            CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+            newTreeIter.reset(reader, getTreeId(latestCommmitId));
+            diffs = git.diff().setShowNameAndStatusOnly(true).setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
+            log.debug(() -> new StringBuilder().append("@<getAlteredFiles(=").append(historicalCommitId)
+                    .append(", latestCommmitId=").append(latestCommmitId).append(") = ").append(diffs.size())
+                    .append(" DiffEntires"));
+        }
         return diffs;
     }
 
