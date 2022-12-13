@@ -1,24 +1,20 @@
 /*
  * Copyright (c) Splendid Data Product Development B.V. 2013
  * 
- * This program is free software: You may redistribute and/or modify under the 
- * terms of the GNU General Public License as published by the Free Software 
- * Foundation, either version 3 of the License, or (at Client's option) any 
- * later version.
+ * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
+ * version.
  * 
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with 
- * this program.  If not, Client should obtain one via www.gnu.org/licenses/.
+ * You should have received a copy of the GNU General Public License along with this program. If not, Client should
+ * obtain one via www.gnu.org/licenses/.
  */
 
 package com.splendiddata.intermal.migrationsyncher;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -43,7 +39,6 @@ import com.splendiddata.internal.migrationsyncher.MigrationSyncherProperties;
  * @since 0.0.1
  */
 public class TestMigrationSyncherDbInterface {
-    public static final String TEST_PROPERTIES_PATH = "src/test/resources/test.properties";
 
     static MigrationSyncherProperties properties;
 
@@ -57,7 +52,7 @@ public class TestMigrationSyncherDbInterface {
      */
     @BeforeAll
     static void init() throws IOException, ClassNotFoundException {
-        properties = new MigrationSyncherProperties(Paths.get(TEST_PROPERTIES_PATH));
+        properties = new MigrationSyncherProperties(PropertiesPath.PROPERTIES_PATH);
 
         Class.forName(Driver.class.getName());
         Properties connectionProperties = new Properties();
@@ -88,7 +83,7 @@ public class TestMigrationSyncherDbInterface {
     @AfterAll
     static void cleanup() throws IOException, ClassNotFoundException {
 
-        properties = new MigrationSyncherProperties(Paths.get("src/test/resources/test.properties"));
+        properties = new MigrationSyncherProperties(PropertiesPath.PROPERTIES_PATH);
 
         Class.forName(Driver.class.getName());
         Properties connectionProperties = new Properties();
