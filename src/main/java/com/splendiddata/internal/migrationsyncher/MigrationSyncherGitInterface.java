@@ -102,7 +102,7 @@ public class MigrationSyncherGitInterface implements Closeable {
         if (properties.getGitPassword() == null) {
             passwordScriptFile = null;
         } else {
-            passwordScriptFile = Paths.get("/tmp/gitaskpass.sh").toFile();
+            passwordScriptFile = Paths.get(System.getProperty("java.io.tmpdir", "/tmp"), "gitaskpass.sh").toFile();
             try (PrintWriter pwFile = new PrintWriter(new FileWriter(passwordScriptFile))) {
                 pwFile.println("#!/bin/bash");
                 pwFile.println("exec echo \"$GIT_PASSWORD\"");
