@@ -224,7 +224,7 @@ public class MigrationSyncherGitInterface implements Closeable {
 
         commandLine.append(' ').append(remoteRepoUrl.getScheme()).append("://");
         if (remoteRepoUrl.getUserInfo() == null && properties.getGitUser() != null) {
-            commandLine.append(properties.getGitUser()).append('@');
+            commandLine.append(properties.getGitUser().replace("@","%40")).append('@');
         }
         commandLine.append(remoteRepoUrl.getHost());
         if (remoteRepoUrl.getPort() > 0) {
