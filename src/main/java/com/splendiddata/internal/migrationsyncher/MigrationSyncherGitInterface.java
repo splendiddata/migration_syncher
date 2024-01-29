@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2020 - 2021
+ * Copyright (c) Splendid Data Product Development B.V. 2020 - 2023
  * 
  * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
  * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.eclipse.jgit.api.CreateBranchCommand.SetupUpstreamMode;
@@ -63,6 +65,8 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
  */
 public class MigrationSyncherGitInterface implements Closeable {
     private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(MigrationSyncherGitInterface.class);
+
+    private static final Pattern BITBUCKET_PATTERN = Pattern.compile("^((.*?)bitbucket\\.org):([^/\\s]+)/(.*)$");
 
     /**
      * Environment variable that could contain a proxy server for https connections
@@ -212,6 +216,13 @@ public class MigrationSyncherGitInterface implements Closeable {
          */
         StringBuilder commandLine = new StringBuilder().append("git clone");
         URI remoteRepoUrl = new URI(properties.getGitRemoteRepositoryUrl());
+        Matcher matcher = BITBUCKET_PATTERN.matcher(properties.getGitRemoteRepositoryUrl());
+        if (matcher.matches()) {
+            remoteRepoUrl = new URI(new StringBuilder("ssh://").append(matcher.group(1)).append('/')
+                    .append(matcher.group(3)).append('/').append(matcher.group(4)).toString());
+        } else {
+            remoteRepoUrl = new URI(properties.getGitRemoteRepositoryUrl());
+        }
         if ("https".equals(remoteRepoUrl.getScheme())) {
             if (properties.getGitCertificate() != null) {
                 commandLine.append(" -c http.sslcert=").append(properties.getGitCertificate());
@@ -224,12 +235,9 @@ public class MigrationSyncherGitInterface implements Closeable {
 
         commandLine.append(' ').append(remoteRepoUrl.getScheme()).append("://");
         if (remoteRepoUrl.getUserInfo() == null && properties.getGitUser() != null) {
-            commandLine.append(properties.getGitUser().replace("@","%40")).append('@');
+            commandLine.append(properties.getGitUser().replace("@", "%40")).append('@');
         }
-        commandLine.append(remoteRepoUrl.getHost());
-        if (remoteRepoUrl.getPort() > 0) {
-            commandLine.append(':').append(remoteRepoUrl.getPort());
-        }
+        commandLine.append(remoteRepoUrl.getAuthority());
         commandLine.append(remoteRepoUrl.getPath()).append(' ')
                 .append(Paths.get(properties.getGitLocalRepository()).toAbsolutePath());
 
