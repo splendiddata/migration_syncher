@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2020 - 2023
+ * Copyright (c) Splendid Data Product Development B.V. 2020 - 2025
  * 
  * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
  * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
@@ -214,7 +214,9 @@ public class MigrationSyncherGitInterface implements Closeable {
         /*
          * Build the git command line
          */
-        StringBuilder commandLine = new StringBuilder().append("git clone");
+        List<String> commandLine = new ArrayList<>();
+        commandLine.add("git");
+        commandLine.add("clone");
         URI remoteRepoUrl = new URI(properties.getGitRemoteRepositoryUrl());
         Matcher matcher = BITBUCKET_PATTERN.matcher(properties.getGitRemoteRepositoryUrl());
         if (matcher.matches()) {
@@ -225,27 +227,31 @@ public class MigrationSyncherGitInterface implements Closeable {
         }
         if ("https".equals(remoteRepoUrl.getScheme())) {
             if (properties.getGitCertificate() != null) {
-                commandLine.append(" -c http.sslcert=").append(properties.getGitCertificate());
+                commandLine.add("-c");
+                commandLine.add("http.sslcert=" + properties.getGitCertificate());
             }
             if (properties.getGitKey() != null) {
-                commandLine.append(" -c http.sslkey=").append(properties.getGitKey());
+                commandLine.add("-c");
+                commandLine.add("http.sslkey=" + properties.getGitKey());
             }
-            commandLine.append(" -c http.sslverify=false");
+            commandLine.add("-c");
+            commandLine.add("http.sslverify=false");
         }
 
-        commandLine.append(' ').append(remoteRepoUrl.getScheme()).append("://");
+        StringBuilder remoteRepo = new StringBuilder().append(remoteRepoUrl.getScheme()).append("://");
         if (remoteRepoUrl.getUserInfo() == null && properties.getGitUser() != null) {
-            commandLine.append(properties.getGitUser().replace("@", "%40")).append('@');
+            remoteRepo.append(properties.getGitUser().replace("@", "%40")).append('@');
         }
-        commandLine.append(remoteRepoUrl.getAuthority());
-        commandLine.append(remoteRepoUrl.getPath()).append(' ')
-                .append(Paths.get(properties.getGitLocalRepository()).toAbsolutePath());
+        remoteRepo.append(remoteRepoUrl.getAuthority());
+        remoteRepo.append(remoteRepoUrl.getPath());
+        commandLine.add(remoteRepo.toString());
+        commandLine.add(properties.getGitLocalRepository());
 
         /*
          * Execute the clone command
          */
-        log.info("Execute: " + commandLine);
-        Process cmd = Runtime.getRuntime().exec(commandLine.toString(),
+        log.info("Execute: " + String.join(" ", commandLine));
+        Process cmd = Runtime.getRuntime().exec(commandLine.toArray(new String[commandLine.size()]),
                 environmentVariables.toArray(new String[environmentVariables.size()]));
         listenToStdoutAndStderr(cmd);
 

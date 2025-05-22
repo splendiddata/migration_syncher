@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2020
+ * Copyright (c) Splendid Data Product Development B.V. 2020 - 2025
  * 
  * This program is free software: You may redistribute and/or modify under the 
  * terms of the GNU General Public License as published by the Free Software 
@@ -17,8 +17,6 @@
 
 package com.splendiddata.internal.migrationsyncher;
 
-import java.util.regex.Pattern;
-
 /**
  * Some utility methods
  *
@@ -26,11 +24,6 @@ import java.util.regex.Pattern;
  * @since 1.0
  */
 public final class Util {
-    
-    /**
-     * Pattern to check for only whitespace strings
-     */
-    public static final Pattern EMPTY_STRING_PATTERN = Pattern.compile("\\s*", Pattern.DOTALL);
 
     /**
      * Utility class - no instances
@@ -48,13 +41,7 @@ public final class Util {
      * @return boolean true if null or empty
      */
     public static boolean isEmpty(String str) {
-        if (str == null) {
-            return true;
-        }
-        if (str.length() == 0) {
-            return true;
-        }
-        return EMPTY_STRING_PATTERN.matcher(str).matches();
+        return str == null || str.isBlank();
     }
 
     /**

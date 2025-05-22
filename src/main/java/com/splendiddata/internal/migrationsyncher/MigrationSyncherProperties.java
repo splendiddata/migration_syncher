@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2020
+ * Copyright (c) Splendid Data Product Development B.V. 2020 - 2025
  * 
  * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
  * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
@@ -167,6 +167,7 @@ public class MigrationSyncherProperties {
                 log.error(e);
             }
         }
+
         dbHost = System.getProperty(DB_HOST, properties.getProperty(DB_HOST, "<unknown host>")).trim();
         int portInt = 5432;
         try {
@@ -174,16 +175,20 @@ public class MigrationSyncherProperties {
         } catch (NumberFormatException e) {
             log.error("DB_PORT property must be an integer in " + propertiesPath + ", 5432 assumed", e);
         }
+
         dbPort = portInt;
+
         dbName = System.getProperty(DB_NAME,
                 properties.getProperty(DB_NAME, System.getenv().getOrDefault("PGDATABASE", "<unknown database>")))
                 .trim();
+
         dbUser = System
                 .getProperty(DB_USER,
                         properties.getProperty(DB_USER, System.getenv().getOrDefault("PGUSER", "<unknown user>")))
                 .trim();
-        String pwd = System.getProperty(DB_PASSWORD, properties.getProperty(DB_PASSWORD, "")).trim();
-        if ("".equals(pwd)) {
+
+        String pwrd = System.getProperty(DB_PASSWORD, properties.getProperty(DB_PASSWORD, "")).trim();
+        if (Util.isEmpty(pwrd)) {
             Path pgPassFile = Paths.get(System.getenv().getOrDefault("PGPASSFILE",
                     System.getProperty("user.home") + System.getProperty("file.separator") + ".pgpass"));
             if (Files.isRegularFile(pgPassFile)) {
@@ -198,30 +203,51 @@ public class MigrationSyncherProperties {
                                         || ("localhost".equalsIgnoreCase(fields[0]) && "::1".equals(dbHost))
                                         || ("127.0.0.1".equals(fields[0]) && "localhost".equalsIgnoreCase(dbHost)))
                                 && fields[1].equals(Integer.toString(dbPort)) && fields[3].equalsIgnoreCase(dbUser)) {
-                            pwd = fields[4];
+                            pwrd = fields[4];
                             break;
                         }
                     }
                 }
             }
         }
-        dbPassword = pwd;
+        dbPassword = pwrd;
+
         dbSyncherSchema = System.getProperty(DB_SYNCHER_SCHEMA,
                 properties.getProperty(DB_SYNCHER_SCHEMA, "splendiddata_migration_syncher")).trim();
+
         dbSearchPath = System.getProperty(DB_SEARCH_PATH, properties.getProperty(DB_SEARCH_PATH, NOT_APPLICABLE))
                 .trim();
+
         dbInitialSql = System.getProperty(DB_INITIAL_SQL, properties.getProperty(DB_INITIAL_SQL, "")).trim();
 
-        gitLocalRepository = System
-                .getProperty(GIT_LOCAL_REPOSITORY, properties.getProperty(GIT_LOCAL_REPOSITORY, "<unknown repo>"))
-                .trim();
+        gitLocalRepository = Paths.get(
+                System.getProperty(GIT_LOCAL_REPOSITORY, properties.getProperty(GIT_LOCAL_REPOSITORY, "<unknown repo>"))
+                        .trim().replaceFirst("^~", System.getProperty("user.home")))
+                .normalize().toFile().getCanonicalPath();
         gitRemoteRepositoryUrl = System.getProperty(GIT_REMOTE_REPOSITORY_URL,
                 properties.getProperty(GIT_REMOTE_REPOSITORY_URL, NOT_APPLICABLE)).trim();
+
         gitUser = System.getProperty(GIT_USER, properties.getProperty(GIT_USER, NOT_APPLICABLE)).trim();
+
         gitPassword = System.getProperty(GIT_PASSWORD, properties.getProperty(GIT_PASSWORD, NOT_APPLICABLE)).trim();
-        gitCertificate = System.getProperty(GIT_CERTIFICATE, properties.getProperty(GIT_CERTIFICATE, NOT_APPLICABLE))
+
+        String pathStr = System.getProperty(GIT_CERTIFICATE, properties.getProperty(GIT_CERTIFICATE, NOT_APPLICABLE))
                 .trim();
-        gitKey = System.getProperty(GIT_KEY, properties.getProperty(GIT_KEY, NOT_APPLICABLE)).trim();
+        if (Util.isEmpty(pathStr) || NOT_APPLICABLE.equalsIgnoreCase(pathStr)) {
+            gitCertificate = NOT_APPLICABLE;
+        } else {
+            gitCertificate = Paths.get(pathStr.replaceFirst("^~", System.getProperty("user.home"))).normalize().toFile()
+                    .getCanonicalPath();
+        }
+
+        pathStr = System.getProperty(GIT_KEY, properties.getProperty(GIT_KEY, NOT_APPLICABLE)).trim();
+        if (Util.isEmpty(pathStr) || NOT_APPLICABLE.equalsIgnoreCase(pathStr)) {
+            gitKey = NOT_APPLICABLE;
+        } else {
+            gitKey = Paths.get(pathStr.replaceFirst("^~", System.getProperty("user.home"))).normalize().toFile()
+                    .getCanonicalPath();
+        }
+
         gitBranch = System.getProperty(GIT_BRANCH, properties.getProperty(GIT_BRANCH, "master")).trim();
 
         String inclDirsString = System.getProperty(INCLUDE_DIRECTORIES, properties.getProperty(INCLUDE_DIRECTORIES, ""))
