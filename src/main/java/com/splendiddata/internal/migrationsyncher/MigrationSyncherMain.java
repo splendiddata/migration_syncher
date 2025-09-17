@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Splendid Data Product Development B.V. 2020 - 2021
+ * Copyright (c) Splendid Data Product Development B.V. 2020 - 2025
  * 
  * This program is free software: You may redistribute and/or modify under the terms of the GNU General Public License
  * as published by the Free Software Foundation, either version 3 of the License, or (at Client's option) any later
@@ -231,10 +231,12 @@ public class MigrationSyncherMain {
         for (ListIterator<String> it = fileNames.listIterator(); it.hasNext();) {
             boolean remove = true;
             Path filePath = Paths.get(properties.getGitLocalRepository(), it.next());
-            for (Path includeDir : properties.getIncludeDirectories()) {
-                if (filePath.startsWith(includeDir)) {
-                    remove = false;
-                    break;
+            if (!filePath.getFileName().toString().equals(".gitignore")) {
+                for (Path includeDir : properties.getIncludeDirectories()) {
+                    if (filePath.startsWith(includeDir)) {
+                        remove = false;
+                        break;
+                    }
                 }
             }
             if (remove) {
@@ -290,24 +292,31 @@ public class MigrationSyncherMain {
      * @throws SQLException
      *             if registration of the file in the database failed.
      */
-    private static boolean executeFile(String file) throws IOException, SQLException {
-        String fileContent = Files.readString(Paths.get(properties.getGitLocalRepository(), file));
-        if (fileContent != null && fileContent.length() > 0 && fileContent.charAt(0) == 0xFEFF) {
-            log.debug(()-> "BOM character removed from " + file);
-            fileContent = fileContent.substring(1);
-        }
+    private static boolean executeFile(String file) throws SQLException {
+        try {
+            String fileContent = Files.readString(Paths.get(properties.getGitLocalRepository(), file));
+            if (fileContent != null && fileContent.length() > 0 && fileContent.charAt(0) == 0xFEFF) {
+                log.debug(()-> "BOM character removed from " + file);
+                fileContent = fileContent.substring(1);
+            }
 
-        SQLException ex = db.executeFileContent(fileContent);
-        if (ex == null) {
-            log.info(file + " - ok");
-            db.logFileExecution(file, null, null);
-            return true;
-        }
+            SQLException ex = db.executeFileContent(fileContent);
+            if (ex == null) {
+                log.info(file + " - ok");
+                db.logFileExecution(file, null, null);
+                return true;
+            }
 
-        log.info(file + " - not ok");
-        errorEncountered = true;
-        db.logFileExecution(file, ex.getSQLState(), ex.getMessage());
-        db.setErroneousFile(file, ex.getSQLState(), ex.getMessage());
+            log.info(file + " - not ok");
+            errorEncountered = true;
+            db.logFileExecution(file, ex.getSQLState(), ex.getMessage());
+            db.setErroneousFile(file, ex.getSQLState(), ex.getMessage());
+        } catch (IOException e) {
+            db.logFileExecution(file, "ioerr", e.getMessage());
+            db.setErroneousFile(file, "ioerr", e.getMessage());
+            log.error("IOException in " + file + ": " + e.getMessage());
+            errorEncountered = true;
+        }
         return false;
     }
 }
