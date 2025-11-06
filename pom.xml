@@ -73,7 +73,7 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <!-- Beware! version 6.10.0.202406032230-r is the newest one that still runs on Java 11 -->
-            <version>6.10.0.202406032230-r</version>
+            <version>6.10.1.202505221210-r</version>
         </dependency>
 
         <dependency>
