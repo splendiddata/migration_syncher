@@ -1,11 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.splendiddata</groupId>
     <artifactId>migration_syncher</artifactId>
-    <version>2.11</version>
+    <version>2.12</version>
     <name>migration_syncher</name>
-    <description>Intends to keep a Postgres database definition in synch with a git repository.</description>
+    <description>Intends to keep a Postgres database definition in synch with a
+        git repository.</description>
     <inceptionYear>2020</inceptionYear>
 
     <organization>
@@ -21,8 +23,10 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/splendiddata/migration_syncher.git</connection>
-        <developerConnection>scm:git:https://github.com/splendiddata/migration_syncher.git</developerConnection>
+        <connection>
+            scm:git:https://github.com/splendiddata/migration_syncher.git</connection>
+        <developerConnection>
+            scm:git:https://github.com/splendiddata/migration_syncher.git</developerConnection>
         <url>https://github.com/splendiddata/migration_syncher</url>
     </scm>
 
@@ -36,8 +40,11 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <log4j.version>2.25.1</log4j.version>
-        <jupiter.version>5.13.4</jupiter.version>
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+        <log4j.version>2.26.1</log4j.version>
+        <!-- Beware! jupiter.version 5.14.4 is the newest one that
+            still runs on Java 11 -->
+        <jupiter.version>5.14.4</jupiter.version>
     </properties>
 
     <dependencies>
@@ -60,19 +67,20 @@
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.10.0</version>
+            <version>1.11.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.7</version>
+            <version>42.7.14</version>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <!-- Beware! version 6.10.0.202406032230-r is the newest one that still runs on Java 11 -->
+            <!-- Beware! version 6.10.1.202505221210-r is the newest one that
+            still runs on Java 11 -->
             <version>6.10.1.202505221210-r</version>
         </dependency>
 
@@ -107,17 +115,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -125,7 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.6.3</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -166,18 +174,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.5.1</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.splendiddata.internal.migrationsyncher.MigrationSyncherMain</mainClass>
+                            <mainClass>
+                                com.splendiddata.internal.migrationsyncher.MigrationSyncherMain</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <License>https://www.gnu.org/licenses/gpl-3.0.en.html</License>
+                            <License>
+                                https://www.gnu.org/licenses/gpl-3.0.en.html</License>
                             <Vendor>https://www.splendiddata.com</Vendor>
-                            <Copyright>Copyright (c) Splendid Data Product Development B.V. 2013 - 2025</Copyright>
+                            <Copyright>Copyright (c) Splendid Data Product
+                                Development B.V. 2013 - 2025</Copyright>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -185,7 +196,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.4</version>
                 <executions>
                     <execution>
                         <goals>
@@ -194,13 +205,14 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.splendiddata.internal.migrationsyncher.MigrationSyncherMain</mainClass>
+                    <mainClass>
+                        com.splendiddata.internal.migrationsyncher.MigrationSyncherMain</mainClass>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.16.0</version>
                 <configuration>
                     <release>${java.version}</release>
                     <compilerArgs>
@@ -211,9 +223,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>3.6.0</version>
                 <configuration>
-                    <!-- This appears necessary to activate the jacoco agent, in combination with jacoco's prepare-agent goal. -->
+                    <!-- This appears necessary to activate the jacoco agent, in
+                    combination with jacoco's prepare-agent goal. -->
                     <argLine>@{argLine}</argLine>
                     <enableProcessChecker>all</enableProcessChecker>
                     <forkedProcessTimeoutInSeconds>60</forkedProcessTimeoutInSeconds>
@@ -224,7 +237,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.13</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
@@ -249,7 +262,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.21.0</version>
+                <version>3.22.0</version>
+            </plugin>
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>10.0.1</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -261,7 +288,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.5.0</version>
                         <executions>
                             <execution>
                                 <id>copy-resources</id>
@@ -270,10 +297,12 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${basedir}/target/usr/local/bin</outputDirectory>
+                                    <outputDirectory>
+                                        ${basedir}/target/usr/local/bin</outputDirectory>
                                     <resources>
                                         <resource>
-                                            <directory>src/main/rpm/usr/local/bin</directory>
+                                            <directory>
+                                                src/main/rpm/usr/local/bin</directory>
                                             <filtering>true</filtering>
                                         </resource>
                                     </resources>
@@ -298,9 +327,11 @@
                             <license>GPLv3</license>
                             <distribution>Splendid Data Cortex</distribution>
                             <group>Development/Tools</group>
+                            <release>${maven.build.timestamp}.${git.commit.id}</release>
                             <mappings>
                                 <mapping>
-                                    <directory>/usr/local/splendiddata/migration_syncher/lib</directory>
+                                    <directory>
+                                        /usr/local/splendiddata/migration_syncher/lib</directory>
                                     <filemode>755</filemode>
                                     <sources>
                                         <source>
@@ -309,7 +340,8 @@
                                     </sources>
                                 </mapping>
                                 <mapping>
-                                    <directory>/usr/local/splendiddata/migration_syncher</directory>
+                                    <directory>
+                                        /usr/local/splendiddata/migration_syncher</directory>
                                     <filemode>755</filemode>
                                     <artifact />
                                 </mapping>
@@ -319,7 +351,8 @@
                                     <filemode>755</filemode>
                                     <sources>
                                         <source>
-                                            <location>target/usr/local/bin/migration_syncher</location>
+                                            <location>
+                                                target/usr/local/bin/migration_syncher</location>
                                         </source>
                                     </sources>
                                 </mapping>
@@ -339,7 +372,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.3</version>
+                <version>3.12.0</version>
                 <configuration>
                     <show>public</show>
                     <failOnError>false</failOnError>
@@ -362,9 +395,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.5.4</version>
-                <configuration>
-                </configuration>
+                <version>3.6.0</version>
+                <configuration> </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -391,5 +423,13 @@
             </plugin>
         </plugins>
     </reporting>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Splendid Data Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com//splendiddata/migration_syncher</url>
+        </repository>
+    </distributionManagement>
 
 </project>
